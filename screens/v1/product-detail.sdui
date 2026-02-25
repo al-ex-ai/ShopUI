@@ -1,0 +1,60 @@
+// Product Detail Screen
+// Demonstrates: data binding, nested components, multiple actions
+
+screen "Product Detail" {
+  layout: column, spacing: 20, padding: 24
+
+  image { src: "{{product.image}}", alt: "{{product.name}}", height: 300 }
+
+  container {
+    direction: "column", spacing: 12
+
+    container {
+      direction: "row", spacing: 12, alignment: "center"
+
+      text { content: "{{product.name}}", variant: "h4" }
+      badge { content: "{{product.category}}", color: "primary" }
+    }
+
+    text { content: "{{product.price}}", variant: "h5", color: "primary.main" }
+    text { content: "{{product.description}}", variant: "body1", color: "text.secondary" }
+
+    divider {}
+
+    container {
+      direction: "row", spacing: 12
+
+      button {
+        label: "Add to Cart",
+        action: api_call("/api/cart/add", "POST", { productId: "{{product.id}}" }),
+        style: "primary"
+      }
+      button {
+        label: "Back to Shop",
+        action: navigate("/"),
+        style: "outlined"
+      }
+    }
+  }
+
+  // Related products
+  text { content: "You might also like", variant: "subtitle1", color: "text.secondary" }
+
+  grid {
+    columns: 3, gap: 16
+
+    each relatedProducts as related {
+      card {
+        elevation: 1
+
+        image { src: related.image, alt: related.name, height: 120 }
+        container {
+          padding: 12
+
+          text { content: related.name, variant: "subtitle2" }
+          text { content: related.price, variant: "body2", color: "primary.main" }
+        }
+      }
+    }
+  }
+}

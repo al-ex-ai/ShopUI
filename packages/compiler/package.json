@@ -1,0 +1,24 @@
+{
+  "name": "@sdui/compiler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "sdui-compile": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "compile": "node dist/cli.js",
+    "dev": "tsc --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sdui/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "vitest": "^3.0.5"
+  }
+}

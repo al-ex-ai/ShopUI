@@ -1,0 +1,40 @@
+// Home Screen — E-Commerce Dashboard
+
+screen "Home" {
+  layout: column, spacing: 20, padding: 24
+
+  // Hero banner
+  container {
+    padding: 24, background: "primary.main", borderRadius: 12
+
+    text { content: "Welcome to ShopUI", variant: "h3", color: "primary.contrastText" }
+    text { content: "Discover amazing products at great prices", variant: "body2", color: "primary.contrastText" }
+  }
+
+  // Product grid
+  text { content: "Featured Products", variant: "subtitle1", color: "text.secondary" }
+
+  grid {
+    columns: 3, gap: 16
+
+    each products as product {
+      card {
+        elevation: 1
+
+        image { src: product.image, alt: product.name, height: 160 }
+        container {
+          padding: 12, direction: "column", spacing: 6
+
+          text { content: product.name, variant: "body1" }
+          text { content: product.price, variant: "subtitle2", color: "primary.main" }
+          button {
+            label: "Add to Cart",
+            action: api_call("/api/cart/add", "POST", { productId: product.id }),
+            style: "outlined",
+            fullWidth: true
+          }
+        }
+      }
+    }
+  }
+}

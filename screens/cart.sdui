@@ -1,0 +1,85 @@
+// Cart Screen
+
+screen "Cart" {
+  layout: column, spacing: 20, padding: 24
+
+  text { content: "Shopping Cart", variant: "h4" }
+
+  if cart.count == 0 {
+    card {
+      elevation: 0
+
+      container {
+        padding: 48, alignment: "center"
+
+        text { content: "Your cart is empty", variant: "subtitle1", align: "center" }
+        spacer { size: 4 }
+        text { content: "Looks like you haven't added anything yet.", variant: "body2", align: "center", color: "text.secondary" }
+        spacer { size: 16 }
+        button {
+          label: "Browse Products",
+          action: navigate("/"),
+          style: "primary"
+        }
+      }
+    }
+  }
+
+  if cart.count > 0 {
+    card {
+      elevation: 0
+
+      each cart.items as item {
+        container {
+          direction: "row", spacing: 14, padding: 14, alignment: "center"
+
+          image { src: item.image, alt: item.name, width: 56, height: 56, objectFit: "contain" }
+          container {
+            direction: "column", spacing: 2, flex: 1
+
+            text { content: item.name, variant: "body2" }
+            container {
+              direction: "row", spacing: 8, alignment: "center"
+
+              text { content: item.price, variant: "subtitle2", color: "primary.main" }
+              badge { content: "x{{item.quantity}}", color: "default" }
+            }
+          }
+          button {
+            label: "Remove",
+            action: api_call("/api/cart/remove", "POST", { productId: item.id }),
+            style: "outlined"
+          }
+        }
+        divider {}
+      }
+    }
+
+    // Total + Checkout
+    container {
+      direction: "row", padding: 8, alignment: "center"
+
+      container {
+        direction: "row", spacing: 8, flex: 1, alignment: "center"
+
+        text { content: "Total:", variant: "body1" }
+        text { content: "{{cart.total}}", variant: "h5", color: "primary.main" }
+      }
+      button {
+        label: "Proceed to Checkout",
+        action: navigate("/checkout"),
+        style: "primary"
+      }
+    }
+
+    container {
+      alignment: "center"
+
+      button {
+        label: "Continue Shopping",
+        action: navigate("/"),
+        style: "text"
+      }
+    }
+  }
+}

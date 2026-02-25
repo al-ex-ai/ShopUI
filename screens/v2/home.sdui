@@ -1,0 +1,69 @@
+// Home Screen V2 — Enhanced with promo banner, ratings, and "New" tags
+
+screen "Home" {
+  layout: column, spacing: 20, padding: 24
+
+  // Hero banner
+  container {
+    padding: 24, background: "primary.main", borderRadius: 12
+
+    text { content: "Welcome to ShopUI", variant: "h3", color: "primary.contrastText" }
+    text { content: "Discover amazing products at great prices", variant: "body2", color: "primary.contrastText" }
+  }
+
+  // Promo banner (V2 addition)
+  container {
+    padding: 16, background: "secondary.main", borderRadius: 8
+
+    container {
+      direction: "row", alignment: "center", spacing: 12
+
+      container {
+        direction: "column", spacing: 4, flex: 1
+
+        text { content: "Winter Sale — Up to 40% Off", variant: "subtitle1", color: "white" }
+        text { content: "Limited time offer on select electronics and accessories", variant: "caption", color: "white" }
+      }
+      badge { content: "SALE", color: "warning" }
+    }
+  }
+
+  // Product grid
+  text { content: "Featured Products", variant: "subtitle1", color: "text.secondary" }
+
+  grid {
+    columns: 3, gap: 16
+
+    each products as product {
+      card {
+        elevation: 1
+
+        image { src: product.image, alt: product.name, height: 160 }
+        container {
+          padding: 12, direction: "column", spacing: 6
+
+          container {
+            direction: "row", spacing: 6, alignment: "center"
+
+            text { content: product.name, variant: "body1" }
+            if product.isNew == true {
+              badge { content: "New", color: "success" }
+            }
+          }
+          container {
+            direction: "row", spacing: 8, alignment: "center"
+
+            text { content: product.price, variant: "subtitle2", color: "primary.main" }
+            text { content: product.rating, variant: "caption", color: "text.secondary" }
+          }
+          button {
+            label: "Add to Cart",
+            action: api_call("/api/cart/add", "POST", { productId: product.id }),
+            style: "outlined",
+            fullWidth: true
+          }
+        }
+      }
+    }
+  }
+}

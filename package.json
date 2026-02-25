@@ -1,0 +1,22 @@
+{
+  "name": "sdui-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mini Server-Driven UI Platform",
+  "scripts": {
+    "build:schema": "pnpm --filter @sdui/schema build",
+    "build:compiler": "pnpm --filter @sdui/compiler build",
+    "compile:screens": "node packages/compiler/dist/cli.js screens dist/screens && node packages/compiler/dist/cli.js screens/v1 dist/screens/v1 && node packages/compiler/dist/cli.js screens/v2 dist/screens/v2",
+    "dev:server": "pnpm --filter @sdui/server dev",
+    "dev:client": "pnpm --filter @sdui/client dev",
+    "build:server": "pnpm --filter @sdui/server build",
+    "build:client": "pnpm --filter @sdui/client build",
+    "build": "pnpm build:schema && pnpm build:compiler && pnpm compile:screens && pnpm build:server && pnpm build:client",
+    "start": "node packages/server/dist/app.js",
+    "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}

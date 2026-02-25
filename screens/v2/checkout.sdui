@@ -1,0 +1,124 @@
+// Checkout Screen V2 — Enhanced with progress steps and express checkout
+
+screen "Checkout" {
+  layout: column, spacing: 16, padding: 24
+
+  text { content: "Checkout", variant: "h4" }
+
+  // Progress indicator (V2 addition)
+  container {
+    direction: "row", spacing: 0, alignment: "center"
+
+    container {
+      direction: "row", spacing: 6, alignment: "center", flex: 1
+
+      badge { content: "1", color: "primary" }
+      text { content: "Shipping", variant: "caption", color: "primary.main" }
+    }
+    text { content: "—", variant: "body2", color: "text.secondary" }
+    container {
+      direction: "row", spacing: 6, alignment: "center", flex: 1
+
+      badge { content: "2", color: "primary" }
+      text { content: "Payment", variant: "caption", color: "primary.main" }
+    }
+    text { content: "—", variant: "body2", color: "text.secondary" }
+    container {
+      direction: "row", spacing: 6, alignment: "center", flex: 1
+
+      badge { content: "3", color: "default" }
+      text { content: "Confirm", variant: "caption", color: "text.secondary" }
+    }
+  }
+
+  // Shipping info
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 14
+
+      text { content: "Shipping Information", variant: "subtitle1", color: "text.secondary" }
+      input { label: "Full Name", binding: "shipping.name", required: true }
+      input { label: "Email", binding: "shipping.email", inputType: "email", required: true }
+      input { label: "Address", binding: "shipping.address", required: true }
+      container {
+        direction: "row", spacing: 16
+
+        input { label: "City", binding: "shipping.city", required: true }
+        input { label: "State", binding: "shipping.state", required: true }
+        input { label: "Zip Code", binding: "shipping.zip", required: true }
+      }
+    }
+  }
+
+  // Payment
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 14
+
+      text { content: "Payment Details", variant: "subtitle1", color: "text.secondary" }
+      input { label: "Name on Card", binding: "payment.nameOnCard", required: true }
+      input { label: "Card Number", binding: "payment.cardNumber", required: true }
+      container {
+        direction: "row", spacing: 16
+
+        input { label: "Expiry (MM/YY)", binding: "payment.expiry", required: true }
+        input { label: "CVV", binding: "payment.cvv", inputType: "password", required: true }
+      }
+    }
+  }
+
+  // Order summary
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 10
+
+      text { content: "Order Summary", variant: "subtitle1", color: "text.secondary" }
+      each cart.items as item {
+        container {
+          direction: "row", spacing: 8, alignment: "center"
+
+          text { content: item.name, variant: "body2", flex: 1 }
+          badge { content: "x{{item.quantity}}", color: "default" }
+          text { content: item.price, variant: "body2", color: "primary.main" }
+        }
+      }
+      divider {}
+      container {
+        direction: "row", spacing: 8
+
+        text { content: "Subtotal:", variant: "body2", color: "text.secondary" }
+        text { content: "{{cart.total}}", variant: "body2" }
+      }
+      container {
+        direction: "row", spacing: 8
+
+        text { content: "Shipping:", variant: "body2", color: "text.secondary" }
+        text { content: "Free", variant: "body2", color: "success.main" }
+      }
+      divider {}
+      container {
+        direction: "row", spacing: 8
+
+        text { content: "Total:", variant: "subtitle1" }
+        text { content: "{{cart.total}}", variant: "subtitle1", color: "primary.main" }
+      }
+    }
+  }
+
+  // Submit
+  button {
+    label: "Place Order",
+    action: api_call("/api/orders/create", "POST", { shipping: "{{shipping}}", payment: "{{payment}}" }),
+    style: "primary",
+    fullWidth: true
+  }
+
+  // Security note (V2 addition)
+  text { content: "Your payment information is encrypted and secure.", variant: "caption", color: "text.secondary", align: "center" }
+}

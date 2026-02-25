@@ -1,0 +1,80 @@
+// Checkout Screen
+// Demonstrates: form inputs, data binding, complex actions
+
+screen "Checkout" {
+  layout: column, spacing: 16, padding: 24
+
+  text { content: "Checkout", variant: "h4" }
+
+  // Shipping info
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 14
+
+      text { content: "Shipping Information", variant: "subtitle1", color: "text.secondary" }
+      input { label: "Full Name", binding: "shipping.name", required: true }
+      input { label: "Email", binding: "shipping.email", inputType: "email", required: true }
+      input { label: "Address", binding: "shipping.address", required: true }
+      container {
+        direction: "row", spacing: 16
+
+        input { label: "City", binding: "shipping.city", required: true }
+        input { label: "Zip Code", binding: "shipping.zip", required: true }
+      }
+    }
+  }
+
+  // Payment
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 14
+
+      text { content: "Payment Details", variant: "subtitle1", color: "text.secondary" }
+      input { label: "Card Number", binding: "payment.cardNumber", required: true }
+      container {
+        direction: "row", spacing: 16
+
+        input { label: "Expiry (MM/YY)", binding: "payment.expiry", required: true }
+        input { label: "CVV", binding: "payment.cvv", inputType: "password", required: true }
+      }
+    }
+  }
+
+  // Order summary
+  card {
+    elevation: 0
+
+    container {
+      padding: 20, direction: "column", spacing: 10
+
+      text { content: "Order Summary", variant: "subtitle1", color: "text.secondary" }
+      each cart.items as item {
+        container {
+          direction: "row", spacing: 8
+
+          text { content: item.name, variant: "body2" }
+          text { content: item.price, variant: "body2", color: "primary.main" }
+        }
+      }
+      divider {}
+      container {
+        direction: "row", spacing: 8
+
+        text { content: "Total:", variant: "body2", color: "text.secondary" }
+        text { content: "{{cart.total}}", variant: "subtitle1", color: "primary.main" }
+      }
+    }
+  }
+
+  // Submit
+  button {
+    label: "Place Order",
+    action: api_call("/api/orders/create", "POST", { shipping: "{{shipping}}", payment: "{{payment}}" }),
+    style: "primary",
+    fullWidth: true
+  }
+}
