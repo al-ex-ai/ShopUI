@@ -34,6 +34,7 @@ import { SDUIRenderer } from "./renderer/SDUIRenderer";
 import { SDUIScreenSkeleton } from "./components/SDUISkeleton";
 import { SDUIErrorBoundary } from "./components/SDUIErrorBoundary";
 import { createActionHandler } from "./renderer/ActionHandler";
+import { NotificationProvider, useNotification } from "./contexts/NotificationContext";
 
 // --- Contexts ---
 
@@ -159,12 +160,14 @@ function ScreenPage({ screenId, params }: { screenId: string; params?: Record<st
   const navigate = useNavigate();
   const { state: inputValues, setValue: setInputValue } = useSDUIState();
   const cart = useContext(CartContext);
+  const { notify } = useNotification();
 
-  const handleAction = createActionHandler(
+  const handleAction = createActionHandler({
     navigate,
-    () => { refetch(); cart.refresh(); },
-    () => inputValues
-  );
+    refetch: () => { refetch(); cart.refresh(); },
+    getFormState: () => inputValues,
+    notify,
+  });
 
   if (loading) return <SDUIScreenSkeleton />;
 
@@ -452,22 +455,24 @@ export default function App() {
       <ThemeModeContext.Provider value={themeState}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <CartContext.Provider value={cartState}>
-            <BrowserRouter>
-              <NavBar onOpenTour={openTour} onOpenMobile={openMobile} />
-              <MobilePreviewDrawer open={mobileOpen} onClose={closeMobile} />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/product/:id" element={<ProductPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-                <Route path="/playground" element={<PlaygroundPage />} />
-                <Route path="/about" element={<AboutPage />} />
-              </Routes>
-              <FeatureTour key={tourKey} open={tourOpen} onClose={closeTour} />
-            </BrowserRouter>
-          </CartContext.Provider>
+          <NotificationProvider>
+            <CartContext.Provider value={cartState}>
+              <BrowserRouter>
+                <NavBar onOpenTour={openTour} onOpenMobile={openMobile} />
+                <MobilePreviewDrawer open={mobileOpen} onClose={closeMobile} />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/product/:id" element={<ProductPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                  <Route path="/playground" element={<PlaygroundPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                </Routes>
+                <FeatureTour key={tourKey} open={tourOpen} onClose={closeTour} />
+              </BrowserRouter>
+            </CartContext.Provider>
+          </NotificationProvider>
         </ThemeProvider>
       </ThemeModeContext.Provider>
     </SchemaVersionContext.Provider>

@@ -12,7 +12,8 @@
     "build:server": "pnpm --filter @sdui/server build",
     "build:client": "pnpm --filter @sdui/client build",
     "build": "pnpm build:schema && pnpm build:compiler && pnpm compile:screens && pnpm build:server && pnpm build:client",
-    "start": "node packages/server/dist/app.js",
+    "start": "node packages/server/dist/index.js",
+    "test": "pnpm --filter @sdui/compiler test && pnpm --filter @sdui/server test",
     "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\""
   },
   "devDependencies": {

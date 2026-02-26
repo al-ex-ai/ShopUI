@@ -1,7 +1,24 @@
 import { Router, type IRouter } from "express";
+import { z } from "zod/v4";
+import rateLimit from "express-rate-limit";
 import { compile } from "@sdui/compiler";
+import { validate } from "../middleware/validate.js";
+import { asyncHandler, AppError } from "../middleware/errorHandler.js";
 
 const router: IRouter = Router();
+
+// Stricter rate limit for AI endpoint: 5 requests per minute per IP
+const aiRateLimit = rateLimit({
+  windowMs: 60_000,
+  limit: 5,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: { code: "AI_RATE_LIMITED", message: "AI generation is rate-limited. Try again in a minute." } },
+});
+
+const generateSchema = z.object({
+  prompt: z.string().min(1, "A prompt is required").max(2000, "Prompt must be under 2000 characters"),
+});
 
 // ---------------------------------------------------------------------------
 // DSL grammar reference — fed to the AI as a system prompt
@@ -123,27 +140,25 @@ screen "Dashboard" {
 // POST /api/ai/generate — Generate DSL from natural language via Gemini
 // ---------------------------------------------------------------------------
 
-router.post("/generate", async (req, res) => {
-  const { prompt } = req.body as { prompt?: string };
+router.post(
+  "/generate",
+  aiRateLimit,
+  validate({ body: generateSchema }),
+  asyncHandler(async (req, res) => {
+    const { prompt } = req.body as z.Infer<typeof generateSchema>;
 
-  if (!prompt || typeof prompt !== "string" || prompt.trim().length === 0) {
-    res.status(400).json({ error: "A 'prompt' field is required." });
-    return;
-  }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === "your-gemini-api-key-here") {
+      throw new AppError(503, "AI_NOT_CONFIGURED", "Gemini API key is not configured.");
+    }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "your-gemini-api-key-here") {
-    res.status(503).json({ error: "Gemini API key is not configured. Set GEMINI_API_KEY in packages/server/.env" });
-    return;
-  }
-
-  try {
-    // Call Gemini API
+    // Call Gemini API with a 15-second timeout
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(15_000),
         body: JSON.stringify({
           system_instruction: { parts: [{ text: DSL_SYSTEM_PROMPT }] },
           contents: [
@@ -163,8 +178,7 @@ router.post("/generate", async (req, res) => {
     if (!geminiRes.ok) {
       const errBody = await geminiRes.text();
       console.error("[AI] Gemini API error:", geminiRes.status, errBody);
-      res.status(502).json({ error: `Gemini API returned ${geminiRes.status}` });
-      return;
+      throw new AppError(502, "AI_UPSTREAM_ERROR", `Gemini API returned ${geminiRes.status}`);
     }
 
     const geminiData = (await geminiRes.json()) as {
@@ -175,8 +189,7 @@ router.post("/generate", async (req, res) => {
       geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
 
     if (!rawDsl) {
-      res.status(502).json({ error: "Gemini returned an empty response." });
-      return;
+      throw new AppError(502, "AI_EMPTY_RESPONSE", "Gemini returned an empty response.");
     }
 
     // Strip markdown code fences if the model wrapped them
@@ -204,10 +217,7 @@ router.post("/generate", async (req, res) => {
       compileErrors: [],
       message: "Screen generated and compiled successfully.",
     });
-  } catch (err) {
-    console.error("[AI] Generation error:", err);
-    res.status(500).json({ error: "Failed to generate screen." });
-  }
-});
+  })
+);
 
 export default router;

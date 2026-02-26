@@ -13,12 +13,18 @@ interface SDUIAction {
 type NavigateFunction = (path: string) => void;
 type RefetchFunction = () => void;
 type GetFormState = () => Record<string, unknown>;
+type NotifyFunction = (message: string, severity: "success" | "error") => void;
 
-export function createActionHandler(
-  navigate: NavigateFunction,
-  refetch: RefetchFunction,
-  getFormState?: GetFormState
-) {
+interface ActionHandlerOptions {
+  navigate: NavigateFunction;
+  refetch: RefetchFunction;
+  getFormState?: GetFormState;
+  notify?: NotifyFunction;
+}
+
+export function createActionHandler(options: ActionHandlerOptions) {
+  const { navigate, refetch, getFormState, notify } = options;
+
   return async function handleAction(action: SDUIAction): Promise<void> {
     console.log("[SDUI Action]", action);
 
@@ -49,20 +55,33 @@ export function createActionHandler(
           });
 
           if (!response.ok) {
-            console.error("[SDUI Action] API call failed:", response.statusText);
+            const errorData = await response.json().catch(() => null);
+            const message = errorData?.error?.message ?? errorData?.error ?? response.statusText;
+            console.error("[SDUI Action] API call failed:", message);
+            notify?.(message, "error");
+            return;
           }
 
           // Check if server wants us to navigate (e.g., after order placement)
           const data = await response.json().catch(() => null);
           if (data?.order?.id) {
+            notify?.("Order placed successfully!", "success");
             refetch();
             navigate(`/order-confirmation?orderId=${data.order.id}`);
             return;
           }
 
+          // Infer success message from endpoint
+          if (endpoint.includes("/cart/add")) {
+            notify?.("Added to cart", "success");
+          } else if (endpoint.includes("/cart/remove")) {
+            notify?.("Removed from cart", "success");
+          }
+
           refetch();
         } catch (err) {
           console.error("[SDUI Action] API call error:", err);
+          notify?.("Network error. Please try again.", "error");
         }
         break;
       }
