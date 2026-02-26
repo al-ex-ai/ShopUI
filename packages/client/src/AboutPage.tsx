@@ -63,9 +63,8 @@ const steps: Step[] = [
       <>
         <Typography variant="body1" sx={SECTION_SX}>
           The platform is structured as a <strong>pnpm monorepo</strong> with four independent packages,
-          each with its own responsibility. This mirrors how Intuit's Dynamic Experiences Platform would
-          be organized — separate concerns for schema definition, compilation, server-side assembly,
-          and client-side rendering.
+          each with its own responsibility — separate concerns for schema definition, compilation,
+          server-side assembly, and client-side rendering.
         </Typography>
 
         <Box component="pre" sx={CODE_BLOCK_SX}>{`sdui-platform/
@@ -687,13 +686,6 @@ Same React renderer handles both versions`}</Box>
           4. Client renderer is version-agnostic — it just renders whatever JSON it receives
         </Typography>
 
-        <Typography variant="subtitle2" color="primary" gutterBottom>Interview Insight</Typography>
-        <Typography variant="body2">
-          This demonstrates <strong>backward compatibility</strong> and <strong>progressive rollout</strong>.
-          In production, you'd use feature flags or A/B testing to gradually shift users from V1 → V2,
-          with instant rollback capability. The client never needs an app update — only the server
-          config changes.
-        </Typography>
       </>
     ),
   },
@@ -805,14 +797,6 @@ Same React renderer handles both versions`}</Box>
           with the platform's capabilities.
         </Typography>
 
-        <Typography variant="subtitle2" color="primary" gutterBottom>Interview Insight</Typography>
-        <Typography variant="body2">
-          This feature demonstrates how AI can be a <strong>developer velocity multiplier</strong> for
-          SDUI platforms. Teams describe intent → AI generates a first draft → compiler validates →
-          humans refine. The DSL's strict grammar means compile-time validation catches AI mistakes
-          before they reach production. In production, this could power a visual editor, Slack bot,
-          or CI/CD integration where product managers describe experiments and get validated screens.
-        </Typography>
       </>
     ),
   },
