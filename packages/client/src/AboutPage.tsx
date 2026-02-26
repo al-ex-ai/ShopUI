@@ -268,10 +268,10 @@ SDUIScreen {
 
         <Typography variant="subtitle2" color="primary" gutterBottom>Test Coverage</Typography>
         <Typography variant="body2">
-          <strong>50 unit tests</strong> across all three stages — 24 lexer tests (keywords, literals,
-          operators, comments, line tracking), 14 parser tests (components, nesting, conditionals, loops,
-          actions), and 12 codegen tests (full compilation of realistic e-commerce screens). Run
-          via <code>vitest</code> in under 1 second.
+          <strong>80 tests</strong> across the platform — <strong>50 compiler tests</strong> (24 lexer, 14 parser,
+          12 codegen) and <strong>30 server tests</strong> (15 route integration tests via supertest, 15 assembler
+          unit tests covering data binding, condition evaluation, loop expansion, and capability filtering). Run
+          via <code>vitest</code> in under 2 seconds.
         </Typography>
       </>
     ),
@@ -310,6 +310,16 @@ SDUIScreen {
 │     └── Capabilities → filter components │
 │  5. Return hydrated SDUIScreen JSON      │
 └─────────────────────────────────────────┘`}</Box>
+
+        <Typography variant="subtitle2" color="primary" gutterBottom>Production Middleware Stack</Typography>
+        <Typography variant="body2" sx={SECTION_SX}>
+          • <strong>Zod validation</strong> — Every route validates params, body, and query with structured error responses<br />
+          • <strong>Rate limiting</strong> — 100 req/min global, 5 req/min for AI endpoint (protects Gemini API costs)<br />
+          • <strong>CORS</strong> — Explicit allowed origins, methods, and credentials<br />
+          • <strong>Request logging</strong> — Method, path, status code, and duration for every request<br />
+          • <strong>Global error handler</strong> — Consistent <code>{"{ error: { code, message } }"}</code> format with <code>AppError</code> class<br />
+          • <strong>Body size limit</strong> — 100KB max to prevent payload abuse
+        </Typography>
 
         <Typography variant="subtitle2" color="primary" gutterBottom>Mock Microservices</Typography>
         <Typography variant="body2" sx={SECTION_SX}>
@@ -503,6 +513,14 @@ SDUIScreen {
           current form state (from <code>useSDUIState</code>) into the request body. This means the
           checkout form inputs are automatically included when "Place Order" is clicked — no manual
           wiring needed.
+        </Typography>
+
+        <Typography variant="subtitle2" color="primary" gutterBottom>Toast Notifications</Typography>
+        <Typography variant="body2" sx={SECTION_SX}>
+          The ActionHandler is wired to a <strong>toast notification system</strong> (MUI Snackbar + Alert).
+          Success actions ("Added to cart", "Order placed") show green toasts; API failures show red error
+          toasts. This replaces silent <code>console.error</code> calls with user-visible feedback — the same
+          pattern used by production e-commerce apps.
         </Typography>
 
         <Typography variant="subtitle2" color="primary" gutterBottom>Response-Driven Navigation</Typography>

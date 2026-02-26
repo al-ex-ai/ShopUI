@@ -24,6 +24,8 @@ A complete **Server-Driven UI** platform built from scratch — custom DSL, comp
 │    • Evaluates conditionals & loops                       │
 │    • Returns ready-to-render JSON                         │
 │                                                           │
+│  Middleware: Zod validation, rate limiting, CORS,          │
+│    request logging, global error handler                  │
 │  Mock Services: products, cart, orders, users             │
 │  Cache: in-memory with TTL                                │
 │  Versioning: v1 / v2 schema negotiation                   │
@@ -54,7 +56,8 @@ A complete **Server-Driven UI** platform built from scratch — custom DSL, comp
 | Compiler   | TypeScript (custom lexer + parser)  |
 | BFF Server | Node + Express + TypeScript         |
 | Client     | React 19 + Vite + MUI + TypeScript  |
-| Testing    | Vitest (50 compiler tests)          |
+| Validation | Zod v4 (request schemas)            |
+| Testing    | Vitest (80 tests — compiler + server)|
 
 ## Project Structure
 
@@ -78,10 +81,18 @@ sdui-platform/
 │   │       └── __tests__/      # 50 unit tests (lexer, parser, codegen)
 │   ├── server/                 # BFF server
 │   │   └── src/
-│   │       ├── app.ts          # Express setup + routes
+│   │       ├── app.ts          # Express setup + middleware stack
+│   │       ├── index.ts        # Server entry point (listen)
 │   │       ├── assembler.ts    # Schema + data → personalized response
 │   │       ├── cache.ts        # In-memory TTL cache
-│   │       └── services/       # Mock microservices (products, cart, etc.)
+│   │       ├── middleware/      # Validation, error handling, logging
+│   │       │   ├── validate.ts       # Zod schema validation
+│   │       │   ├── errorHandler.ts   # Global error handler + AppError
+│   │       │   ├── requestLogger.ts  # Request timing/logging
+│   │       │   └── capabilities.ts   # Client capability negotiation
+│   │       ├── routes/          # cart, screens, orders, ai
+│   │       ├── services/       # Mock microservices (products, cart, etc.)
+│   │       └── __tests__/      # 30 tests (routes + assembler)
 │   └── client/                 # React SDUI renderer
 │       └── src/
 │           ├── App.tsx         # Routing, theme, NavBar, feature tour
@@ -94,6 +105,8 @@ sdui-platform/
 │           │   ├── SDUISkeleton.tsx      # Loading placeholders
 │           │   ├── SDUIErrorBoundary.tsx # Render error recovery
 │           │   └── FeatureTour.tsx       # Interactive guided tour
+│           ├── contexts/
+│           │   └── NotificationContext.tsx  # Toast notification system
 │           └── hooks/
 │               ├── useScreen.ts         # Fetch + cache screen schema
 │               └── useSDUIState.ts      # Local form state bindings
@@ -171,8 +184,14 @@ pnpm dev:client    # http://localhost:5174
 ## Running Tests
 
 ```bash
-# Compiler unit tests (50 tests)
+# All tests (80 total)
+pnpm test
+
+# Compiler unit tests (50 tests: lexer, parser, codegen)
 pnpm --filter @sdui/compiler test
+
+# Server tests (30 tests: routes + assembler)
+pnpm --filter @sdui/server test
 ```
 
 ## Key Features
@@ -183,8 +202,10 @@ Toggle between v1 and v2 schemas via the version chip in the NavBar. The server 
 ### Action System
 Components declare actions in the DSL that the client interprets at runtime:
 - **`navigate("/path")`** — Client-side routing via React Router
-- **`api_call("/endpoint", "POST", { body })`** — API calls with automatic screen refresh
+- **`api_call("/endpoint", "POST", { body })`** — API calls with automatic screen refresh and toast feedback
 - **`set_state("key", value)`** — Local state mutations for form bindings
+
+Success/error feedback is surfaced via a toast notification system (MUI Snackbar) wired into the action handler.
 
 ### Error Boundary
 The `SDUIErrorBoundary` wraps all rendered components. If a bad schema causes a render crash, users see a friendly error with a retry button instead of a white screen.
@@ -220,6 +241,9 @@ Describe a screen in plain English → AI generates DSL → compiler validates �
 
 - **Custom DSL over JSON authoring** — More readable, catches errors at compile time, enables tooling
 - **BFF assembles final schema** — Client stays thin; server handles data fetching, personalization, and conditional logic
+- **Zod validation on every route** — Request bodies, params, and queries validated with structured error responses
+- **Global error handler + AppError** — Consistent `{ error: { code, message } }` format across all endpoints
+- **App/server split** — `app.ts` exports the Express app, `index.ts` calls listen — enables supertest integration tests
 - **No external tour library** — Built spotlight tour with pure CSS box-shadow cutout technique
 - **Class component for error boundary** — React requires class components for `getDerivedStateFromError`
 - **MUI for components** — Familiar, accessible, themeable — focus stays on the SDUI architecture, not styling
