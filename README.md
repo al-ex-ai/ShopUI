@@ -54,10 +54,10 @@ A complete **Server-Driven UI** platform built from scratch — custom DSL, comp
 |------------|-------------------------------------|
 | Monorepo   | pnpm workspaces                     |
 | Compiler   | TypeScript (custom lexer + parser)  |
-| BFF Server | Node + Express + TypeScript         |
-| Client     | React 19 + Vite + MUI + TypeScript  |
+| BFF Server | Node + Express 4 + TypeScript        |
+| Client     | React 19 + Vite 8 + MUI + TypeScript |
 | Validation | Zod v4 (request schemas)            |
-| Testing    | Vitest (80 tests — compiler + server)|
+| Testing    | Vitest (160 tests: compiler + server)|
 
 ## Project Structure
 
@@ -92,7 +92,7 @@ sdui-platform/
 │   │       │   └── capabilities.ts   # Client capability negotiation
 │   │       ├── routes/          # cart, screens, orders, ai
 │   │       ├── services/       # Mock microservices (products, cart, etc.)
-│   │       └── __tests__/      # 30 tests (routes + assembler)
+│   │       └── __tests__/      # 60 tests (routes + assembler)
 │   └── client/                 # React SDUI renderer
 │       └── src/
 │           ├── App.tsx         # Routing, theme, NavBar, feature tour
@@ -184,13 +184,13 @@ pnpm dev:client    # http://localhost:5174
 ## Running Tests
 
 ```bash
-# All tests (80 total)
+# All tests (160 total)
 pnpm test
 
-# Compiler unit tests (50 tests: lexer, parser, codegen)
+# Compiler unit tests (100 tests: lexer, parser, codegen)
 pnpm --filter @sdui/compiler test
 
-# Server tests (30 tests: routes + assembler)
+# Server tests (60 tests: routes + assembler)
 pnpm --filter @sdui/server test
 ```
 
