@@ -251,3 +251,11 @@ Describe a screen in plain English → AI generates DSL → compiler validates �
 - **MUI for components**: Familiar, accessible, themeable, so focus stays on the SDUI architecture, not styling
 - **AI generates DSL, not JSON**: Compiler validates AI output the same way it validates human-authored code
 - **Gemini via REST**: Simple HTTP call, no SDK dependency; easily swappable for Claude, OpenAI, etc.
+
+## License
+
+Apache 2.0. See [LICENSE](LICENSE).
+
+## Author
+
+Alex Husniddinov
