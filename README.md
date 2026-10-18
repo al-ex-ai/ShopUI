@@ -1,8 +1,10 @@
-# SDUI Platform
+# ShopUI
 
-A complete **Server-Driven UI** platform built from scratch — custom DSL, compiler pipeline, BFF server, and React renderer. The demo domain is an e-commerce storefront.
+A complete **Server-Driven UI** platform built from scratch: custom DSL, compiler pipeline, BFF server, and React renderer. The demo domain is an e-commerce storefront.
 
-**Live Demo:** [https://shopui.al-ex.ai](https://shopui.al-ex.ai)
+**Live Demo:** [shopui.al-ex.ai](https://shopui.al-ex.ai)
+
+![ShopUI storefront rendered entirely from server-driven JSON schemas](docs/screenshot.png)
 
 ## Architecture
 
@@ -159,9 +161,9 @@ Source (.sdui)
 └─────────┘             └────────┘            └─────────┘
 ```
 
-1. **Lexer** — Tokenizes source into keywords (`screen`, `if`, `each`, `as`), literals (strings, numbers, booleans), operators (`>`, `==`, `!=`), identifiers, and symbols
-2. **Parser** — Recursive descent parser producing an AST with `ScreenNode`, `ComponentNode`, `ConditionalNode`, `LoopNode`
-3. **CodeGen** — Transforms AST into the JSON schema format, resolving data references to `{{binding}}` syntax
+1. **Lexer**: Tokenizes source into keywords (`screen`, `if`, `each`, `as`), literals (strings, numbers, booleans), operators (`>`, `==`, `!=`), identifiers, and symbols
+2. **Parser**: Recursive descent parser producing an AST with `ScreenNode`, `ComponentNode`, `ConditionalNode`, `LoopNode`
+3. **CodeGen**: Transforms AST into the JSON schema format, resolving data references to `{{binding}}` syntax
 
 ## Quick Start
 
@@ -201,9 +203,9 @@ Toggle between v1 and v2 schemas via the version chip in the NavBar. The server 
 
 ### Action System
 Components declare actions in the DSL that the client interprets at runtime:
-- **`navigate("/path")`** — Client-side routing via React Router
-- **`api_call("/endpoint", "POST", { body })`** — API calls with automatic screen refresh and toast feedback
-- **`set_state("key", value)`** — Local state mutations for form bindings
+- **`navigate("/path")`**: Client-side routing via React Router
+- **`api_call("/endpoint", "POST", { body })`**: API calls with automatic screen refresh and toast feedback
+- **`set_state("key", value)`**: Local state mutations for form bindings
 
 Success/error feedback is surfaced via a toast notification system (MUI Snackbar) wired into the action handler.
 
@@ -223,7 +225,7 @@ Toggle via the theme icon in the NavBar. Persisted in localStorage.
 First-time visitors get a spotlight tour highlighting key UI features. Reopen anytime via the `?` icon.
 
 ### AI Playground (Gemini)
-Describe a screen in plain English → AI generates DSL → compiler validates → renderer previews live. Demonstrates AI as a developer velocity multiplier. The compiler acts as a safety net — AI hallucinations are caught at compile time, not runtime.
+Describe a screen in plain English → AI generates DSL → compiler validates → renderer previews live. Demonstrates AI as a developer velocity multiplier. The compiler acts as a safety net: AI hallucinations are caught at compile time, not runtime.
 
 ## API Endpoints
 
@@ -239,13 +241,13 @@ Describe a screen in plain English → AI generates DSL → compiler validates �
 
 ## Design Decisions
 
-- **Custom DSL over JSON authoring** — More readable, catches errors at compile time, enables tooling
-- **BFF assembles final schema** — Client stays thin; server handles data fetching, personalization, and conditional logic
-- **Zod validation on every route** — Request bodies, params, and queries validated with structured error responses
-- **Global error handler + AppError** — Consistent `{ error: { code, message } }` format across all endpoints
-- **App/server split** — `app.ts` exports the Express app, `index.ts` calls listen — enables supertest integration tests
-- **No external tour library** — Built spotlight tour with pure CSS box-shadow cutout technique
-- **Class component for error boundary** — React requires class components for `getDerivedStateFromError`
-- **MUI for components** — Familiar, accessible, themeable — focus stays on the SDUI architecture, not styling
-- **AI generates DSL, not JSON** — Compiler validates AI output the same way it validates human-authored code
-- **Gemini via REST** — Simple HTTP call, no SDK dependency; easily swappable for Claude, OpenAI, etc.
+- **Custom DSL over JSON authoring**: More readable, catches errors at compile time, enables tooling
+- **BFF assembles final schema**: Client stays thin; server handles data fetching, personalization, and conditional logic
+- **Zod validation on every route**: Request bodies, params, and queries validated with structured error responses
+- **Global error handler + AppError**: Consistent `{ error: { code, message } }` format across all endpoints
+- **App/server split**: `app.ts` exports the Express app, `index.ts` calls listen, which enables supertest integration tests
+- **No external tour library**: Built spotlight tour with pure CSS box-shadow cutout technique
+- **Class component for error boundary**: React requires class components for `getDerivedStateFromError`
+- **MUI for components**: Familiar, accessible, themeable, so focus stays on the SDUI architecture, not styling
+- **AI generates DSL, not JSON**: Compiler validates AI output the same way it validates human-authored code
+- **Gemini via REST**: Simple HTTP call, no SDK dependency; easily swappable for Claude, OpenAI, etc.
